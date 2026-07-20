@@ -1,0 +1,6 @@
+{
+  "name": "Sunrock Banner Replicator",
+  "description": "Replicates the Sunrock solar energy landing page banner with a pure black background, DM Sans font, and perfect layout alignment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
