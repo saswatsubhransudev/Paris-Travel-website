@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth Scroll Animation with Layout</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"DM Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+        }
+
+        .canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        canvas {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="canvas-container">
+        <canvas id="scroll-canvas"></canvas>
+    </div>
+
+    <!-- Inject Tailwind Layout -->
+    <div id="content-overlay">
+<div class="min-h-screen bg-transparent text-white font-sans flex flex-col items-center justify-start p-4 md:p-6 lg:p-8 gap-12 selection:bg-neutral-800 selection:text-white">
+      <!-- Banner Section - Fixed 900px height container -->
+      <div class="w-full max-w-7xl h-[900px] bg-transparent text-white font-sans flex flex-col justify-between p-6 md:p-8 lg:p-10 border border-white/10 rounded-2xl relative overflow-hidden shrink-0">
+        
+        <!-- Navigation Header -->
+        <header id="header-nav" class="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+          
+          <!-- Institutional-style Brand Header -->
+          <div class="flex flex-col">
+            <span class="text-[10px] tracking-[0.4em] uppercase font-bold text-white mb-0.5">
+              JOURNEYS
+            </span>
+            <div class="h-[1px] w-12 bg-white mb-1"></div>
+            <span class="text-[8px] tracking-[0.15em] uppercase text-neutral-500 font-medium">
+              Paris Curated Experiences
+            </span>
+          </div>
+
+          <!-- Center Menu Navigation Links - Single line without wrapping, styled as transparent blur capsule -->
+          <nav id="nav-links" class="flex flex-row items-center justify-center gap-x-4 text-[9px] tracking-[0.2em] uppercase font-medium bg-white/[0.04] backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full overflow-x-auto whitespace-nowrap scrollbar-none">
+            <a
+              id="nav-home"
+              href="#home"
+              class="text-white hover:opacity-100 transition-opacity pb-0.5 border-b border-white"
+            >
+              Home
+            </a>
+            <span class="text-neutral-700">/</span>
+            <a
+              id="nav-solutions"
+              href="#destinations"
+              class="text-neutral-400 hover:text-white hover:opacity-100 transition-colors pb-0.5"
+            >
+              Destinations
+            </a>
+            <span class="text-neutral-700">/</span>
+            <a
+              id="nav-projects"
+              href="#tours"
+              class="text-neutral-400 hover:text-white hover:opacity-100 transition-colors pb-0.5"
+            >
+              Tours
+            </a>
+            <span class="text-neutral-700">/</span>
+            <a
+              id="nav-about"
+              href="#about"
+              class="text-neutral-400 hover:text-white hover:opacity-100 transition-colors pb-0.5"
+            >
+              About us
+            </a>
+            <span class="text-neutral-700">/</span>
+            <a
+              id="nav-contact"
+              href="#contact"
+              class="text-neutral-400 hover:text-white hover:opacity-100 transition-colors pb-0.5"
+            >
+              Contact
+            </a>
+          </nav>
+
+          <!-- Right Side Header Options -->
+          <div id="header-actions" class="flex items-center">
+            <button
+              id="btn-open-menu"
+              onclick="document.getElementById('mobile-menu').classList.remove('hidden'); setTimeout(() => document.getElementById('mobile-menu').classList.remove('opacity-0'), 10);"
+              class="flex items-center gap-1.5 text-[9px] tracking-[0.2em] uppercase font-semibold text-neutral-300 hover:text-white transition-colors"
+            >
+              Open menu
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Main Hero Copy Container - Shifted down with top spacing to allow breathing room and avoid card overlap -->
+        <main id="hero-main" class="w-full max-w-4xl mx-auto flex flex-col items-center text-center my-auto py-4">
+          <!-- Priority Badge -->
+          <span class="inline-block px-2.5 py-1 border border-white/25 text-[8px] tracking-[0.25em] uppercase font-bold mb-5 text-neutral-300 bg-neutral-950">
+            Exclusive European Collection
+          </span>
+
+          <!-- Headline (54px & Medium weight) -->
+          <h1 data-aos="fade-up" id="hero-heading" class="text-3xl sm:text-4xl md:text-[54px] font-medium tracking-[-0.03em] text-white leading-[1.1] max-w-3xl uppercase">
+            Discover the Magic<br>of Paris with<br>Unforgettable Journeys
+          </h1>
+          
+          <!-- Vertical divider line and subtext (Reduced size and regular weight) -->
+          <div data-aos="fade-up" data-aos-delay="100" class="flex gap-4 mt-4 justify-center text-left max-w-xl">
+            <div class="w-[1.5px] bg-white shrink-0 self-stretch"></div>
+            <p id="hero-subtext" class="text-neutral-400 text-xs font-normal leading-relaxed tracking-normal">
+              From iconic landmarks to hidden streets, we create personalized Paris experiences that turn every trip into a lifelong memory.
+            </p>
+          </div>
+
+          <!-- CTA Button -->
+          <div data-aos="fade-up" data-aos-delay="200" id="hero-cta" class="mt-5">
+            <a
+              id="btn-talk"
+              href="#tours"
+              class="group flex items-center gap-3.5 bg-white text-black px-6 py-2.5 rounded-none font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-neutral-200 transition-all duration-300 border border-transparent hover:border-white shadow-lg"
+            >
+              Explore Tours
+              <span class="flex items-center justify-center w-5 h-5 bg-black rounded-full text-white transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+              </span>
+            </a>
+          </div>
+        </main>
+
+        <!-- Footer Grid Info Overlay - Compact height, narrower layout, and transparent blur backgrounds -->
+        <footer id="hero-footer" class="w-full max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-white/20">
+          
+          <!-- Card 1 - Tailor-Made Paris Adventures -->
+          <div data-aos="fade-up" data-aos-delay="300" id="card-clean-energy" class="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col justify-between gap-3">
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[8px] tracking-[0.2em] uppercase text-neutral-500 font-bold">
+                  01 / Custom Journeys
+                </span>
+                <div class="w-5 h-5 bg-white/5 border border-white/10 flex items-center justify-center rounded">
+                  <!-- Lightning / Compass vector representation -->
+                  <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </div>
+              </div>
+              <h3 id="clean-energy-title" class="text-xs font-semibold tracking-[0.1em] uppercase text-white border-b border-white/10 pb-1">
+                Tailor-Made Paris Adventures
+              </h3>
+              <p id="clean-energy-desc" class="text-[11px] text-neutral-400 font-normal leading-relaxed">
+                Experience Paris your way with personalized itineraries, expert local guides, and unforgettable moments at every turn.
+              </p>
+            </div>
+            <div class="mt-0.5">
+              <span class="text-xl font-bold tracking-tighter text-white">12,000+</span>
+              <span class="text-[7.5px] tracking-[0.15em] uppercase text-neutral-500 block">Custom Trips Planned</span>
+            </div>
+          </div>
+
+          <!-- Card 2 - Trusted by Thousands of Travelers -->
+          <div data-aos="fade-up" data-aos-delay="400" id="card-impact" class="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col justify-between gap-3">
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[8px] tracking-[0.2em] uppercase text-neutral-500 font-bold">
+                  02 / Global Travelers
+                </span>
+                <div class="w-5 h-5 bg-white/5 border border-white/10 flex items-center justify-center rounded">
+                  <!-- Globe / User custom vector representation -->
+                  <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 id="impact-title" class="text-xs font-semibold tracking-[0.1em] uppercase text-white border-b border-white/10 pb-1">
+                Trusted by Thousands of Travelers
+              </h3>
+              <p id="impact-desc" class="text-[11px] text-neutral-400 font-normal leading-relaxed">
+                From romantic getaways to family vacations, we've helped visitors create seamless and memorable Paris experiences with exceptional service.
+              </p>
+            </div>
+            <div class="mt-0.5">
+              <span class="text-xl font-bold tracking-tighter text-white">4.9 / 5.0 ★</span>
+              <span class="text-[7.5px] tracking-[0.15em] uppercase text-neutral-500 block">Average Customer Rating</span>
+            </div>
+          </div>
+
+        </footer>
+      </div>
+
+
+      <!-- Second Section - About Us (Reusing Original Brands Layout) -->
+      <div id="about" class="w-full max-w-7xl bg-transparent border border-white/10 rounded-2xl py-16 px-6 md:px-12 flex flex-col items-center justify-between text-center relative overflow-hidden min-h-[520px]">
+        
+        <!-- Subtle cinematic ambient lighting backdrops -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-amber-500/10 blur-[120px] pointer-events-none"></div>
+        <div class="absolute top-1/3 left-1/4 w-72 h-72 rounded-full bg-blue-500/5 blur-[100px] pointer-events-none"></div>
+
+        <!-- Content Container -->
+        <div class="w-full flex flex-col items-center gap-6 z-10 my-auto">
+          <!-- Main Headline with Serif Italic font and DM Sans mix -->
+          <h2 data-aos="fade-up" class="text-3xl sm:text-4xl md:text-[50px] font-normal leading-[1.2] tracking-tight max-w-3xl flex flex-col items-center justify-center">
+            <span class="font-serif italic font-light text-white block">Creating</span>
+            <span class="font-sans font-medium text-white block mt-1">Extraordinary Paris</span>
+            <span class="block mt-1">
+              <span class="font-serif italic font-light text-white mr-2.5">Experiences</span>
+            </span>
+          </h2>
+
+          <!-- Subtext with editorial italic and regular mix -->
+          <p data-aos="fade-up" data-aos-delay="100" class="text-neutral-400 text-xs md:text-sm max-w-2xl font-normal leading-relaxed tracking-wide">
+            <span class="font-serif italic text-neutral-300">Founded by passionate travel enthusiasts, </span>
+            <span>Journeys specializes in crafting personalized travel experiences throughout Paris and France. Our local expertise, attention to detail, and dedication to exceptional service ensure every journey is seamless from arrival to departure.</span>
+          </p>
+        </div>
+
+        <!-- Horizontal Row of "Why Choose Us" (Reusing Brands Logo Grid) -->
+        <div class="w-full border-t border-white/10 pt-10 mt-12 z-10">
+          <div data-aos="fade-up" data-aos-delay="200" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 items-center justify-items-center gap-y-8 gap-x-6 opacity-80 hover:opacity-100 transition-opacity duration-300">
+            
+            <div class="flex flex-col items-center gap-2"><div class="w-5 h-5 rounded-full bg-white/5 border border-white/15 flex items-center justify-center text-[10px]">✔</div><span class="text-[8px] tracking-[0.1em] font-bold text-white text-center">LOCAL TRAVEL SPECIALISTS</span></div>
+            <div class="flex flex-col items-center gap-2"><div class="w-5 h-5 rounded-full bg-white/5 border border-white/15 flex items-center justify-center text-[10px]">✔</div><span class="text-[8px] tracking-[0.1em] font-bold text-white text-center">PERSONALIZED ITINERARIES</span></div>
+            <div class="flex flex-col items-center gap-2"><div class="w-5 h-5 rounded-full bg-white/5 border border-white/15 flex items-center justify-center text-[10px]">✔</div><span class="text-[8px] tracking-[0.1em] font-bold text-white text-center">TRANSPARENT PRICING</span></div>
+            <div class="flex flex-col items-center gap-2"><div class="w-5 h-5 rounded-full bg-white/5 border border-white/15 flex items-center justify-center text-[10px]">✔</div><span class="text-[8px] tracking-[0.1em] font-bold text-white text-center">PREMIUM ACCOMMODATIONS</span></div>
+            <div class="flex flex-col items-center gap-2"><div class="w-5 h-5 rounded-full bg-white/5 border border-white/15 flex items-center justify-center text-[10px]">✔</div><span class="text-[8px] tracking-[0.1em] font-bold text-white text-center">PRIVATE GUIDED EXPERIENCES</span></div>
+            <div class="flex flex-col items-center gap-2"><div class="w-5 h-5 rounded-full bg-white/5 border border-white/15 flex items-center justify-center text-[10px]">✔</div><span class="text-[8px] tracking-[0.1em] font-bold text-white text-center">24/7 CUSTOMER SUPPORT</span></div>
+            <div class="flex flex-col items-center gap-2"><div class="w-5 h-5 rounded-full bg-white/5 border border-white/15 flex items-center justify-center text-[10px]">✔</div><span class="text-[8px] tracking-[0.1em] font-bold text-white text-center">TRUSTED WORLDWIDE</span></div>
+
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- Third Section - Destinations (Reusing Kinetic Studio Staggered Cards) -->
+      <div id="destinations" class="w-full max-w-7xl bg-transparent border border-white/10 rounded-2xl py-16 px-6 md:px-12 flex flex-col items-center justify-start text-center relative overflow-hidden min-h-[750px] shrink-0 mt-12">
+        
+        <!-- Subtle cinematic ambient lighting backdrops -->
+        <div class="absolute top-1/4 left-1/3 w-80 h-80 rounded-full bg-orange-500/5 blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-neutral-800/15 blur-[120px] pointer-events-none"></div>
+
+        <!-- Content Header Container -->
+        <div class="w-full flex flex-col items-center gap-4 z-10 mb-16">
+          <span data-aos="fade-up" class="text-[9px] tracking-[0.3em] uppercase font-bold text-orange-500">
+            Featured Destinations
+          </span>
+          <h2 data-aos="fade-up" data-aos-delay="100" class="text-3xl sm:text-4xl md:text-[46px] font-normal leading-[1.25] tracking-tight max-w-4xl text-white flex flex-col items-center justify-center">
+            <span class="block">
+              <span class="font-serif italic font-light text-white mr-3">Explore the</span>
+              <span class="font-sans font-normal text-neutral-300">Finest Destinations</span>
+            </span>
+            <span class="block mt-2">
+              <span class="font-serif italic font-light text-white mr-2.5">Around</span>
+              <span class="font-sans font-medium text-white">Paris</span>
+            </span>
+          </h2>
+          <p data-aos="fade-up" data-aos-delay="200" class="text-neutral-500 text-[10px] md:text-xs max-w-lg font-normal leading-relaxed tracking-wide mt-4">
+            From world-famous landmarks to charming countryside escapes, discover handpicked destinations that showcase the elegance, culture, and beauty of France.
+          </p>
+        </div>
+
+        <!-- Asymmetric Staggered Cards Grid -->
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start z-10 pb-12">
+          
+          <!-- Card 1 -->
+          <div data-aos="fade-up" data-aos-delay="100" class="border border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[350px] text-left transition-all duration-300 hover:border-white/25 md:mt-0 relative overflow-hidden group">
+            <img src="eiffel_tower_1784522194730.png" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700 pointer-events-none z-[-2]">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-[-1]"></div>
+            <div class="flex items-start justify-start">
+              <span class="text-[9px] tracking-[0.25em] uppercase font-bold text-neutral-200 border border-white/20 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md">
+                Landmark
+              </span>
+            </div>
+            <div class="flex flex-col gap-3 mt-auto relative z-10">
+              <div class="w-2 h-2 bg-orange-500 rounded-full mb-1 shadow-[0_0_10px_rgba(249,115,22,0.8)]"></div>
+              <h3 class="text-base font-semibold tracking-wide text-white drop-shadow-md">Eiffel Tower</h3>
+              <p class="text-[11px] text-neutral-300 font-normal leading-relaxed drop-shadow-md">Experience breathtaking panoramic views from Paris' most iconic landmark.</p>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div data-aos="fade-up" data-aos-delay="200" class="border border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[350px] text-left transition-all duration-300 hover:border-white/25 md:mt-12 relative overflow-hidden group">
+            <img src="louvre_museum_1784522205829.png" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700 pointer-events-none z-[-2]">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-[-1]"></div>
+            <div class="flex items-start justify-start">
+              <span class="text-[9px] tracking-[0.25em] uppercase font-bold text-neutral-200 border border-white/20 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md">
+                Museum
+              </span>
+            </div>
+            <div class="flex flex-col gap-3 mt-auto relative z-10">
+              <div class="w-2 h-2 bg-orange-500 rounded-full mb-1 shadow-[0_0_10px_rgba(249,115,22,0.8)]"></div>
+              <h3 class="text-base font-semibold tracking-wide text-white drop-shadow-md">Louvre Museum</h3>
+              <p class="text-[11px] text-neutral-300 font-normal leading-relaxed drop-shadow-md">Home to thousands of masterpieces, including the legendary Mona Lisa.</p>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div data-aos="fade-up" data-aos-delay="300" class="border border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[350px] text-left transition-all duration-300 hover:border-white/25 md:mt-6 relative overflow-hidden group">
+            <img src="notre_dame_1784522216340.png" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700 pointer-events-none z-[-2]">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-[-1]"></div>
+            <div class="flex items-start justify-start">
+              <span class="text-[9px] tracking-[0.25em] uppercase font-bold text-neutral-200 border border-white/20 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md">
+                Historic
+              </span>
+            </div>
+            <div class="flex flex-col gap-3 mt-auto relative z-10">
+              <div class="w-2 h-2 bg-orange-500 rounded-full mb-1 shadow-[0_0_10px_rgba(249,115,22,0.8)]"></div>
+              <h3 class="text-base font-semibold tracking-wide text-white drop-shadow-md">Notre-Dame Cathedral</h3>
+              <p class="text-[11px] text-neutral-300 font-normal leading-relaxed drop-shadow-md">Marvel at centuries of Gothic architecture and French history.</p>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div data-aos="fade-up" data-aos-delay="400" class="border border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[350px] text-left transition-all duration-300 hover:border-white/25 md:mt-0 relative overflow-hidden group">
+            <img src="montmartre_1784522227028.png" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700 pointer-events-none z-[-2]">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-[-1]"></div>
+            <div class="flex items-start justify-start">
+              <span class="text-[9px] tracking-[0.25em] uppercase font-bold text-neutral-200 border border-white/20 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md">
+                Culture
+              </span>
+            </div>
+            <div class="flex flex-col gap-3 mt-auto relative z-10">
+              <div class="w-2 h-2 bg-orange-500 rounded-full mb-1 shadow-[0_0_10px_rgba(249,115,22,0.8)]"></div>
+              <h3 class="text-base font-semibold tracking-wide text-white drop-shadow-md">Montmartre</h3>
+              <p class="text-[11px] text-neutral-300 font-normal leading-relaxed drop-shadow-md">Stroll through artistic streets, cozy cafés, and the famous Sacré-Cœur Basilica.</p>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div data-aos="fade-up" data-aos-delay="500" class="border border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[350px] text-left transition-all duration-300 hover:border-white/25 md:mt-12 relative overflow-hidden group">
+            <img src="versailles_1784522250822.png" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700 pointer-events-none z-[-2]">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-[-1]"></div>
+            <div class="flex items-start justify-start">
+              <span class="text-[9px] tracking-[0.25em] uppercase font-bold text-neutral-200 border border-white/20 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md">
+                Royal
+              </span>
+            </div>
+            <div class="flex flex-col gap-3 mt-auto relative z-10">
+              <div class="w-2 h-2 bg-orange-500 rounded-full mb-1 shadow-[0_0_10px_rgba(249,115,22,0.8)]"></div>
+              <h3 class="text-base font-semibold tracking-wide text-white drop-shadow-md">Palace of Versailles</h3>
+              <p class="text-[11px] text-neutral-300 font-normal leading-relaxed drop-shadow-md">Explore magnificent royal gardens and the lavish palace of Louis XIV.</p>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div data-aos="fade-up" data-aos-delay="600" class="border border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[350px] text-left transition-all duration-300 hover:border-white/25 md:mt-6 relative overflow-hidden group">
+            <img src="seine_cruise_1784522260645.png" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700 pointer-events-none z-[-2]">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-[-1]"></div>
+            <div class="flex items-start justify-start">
+              <span class="text-[9px] tracking-[0.25em] uppercase font-bold text-neutral-200 border border-white/20 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md">
+                Cruise
+              </span>
+            </div>
+            <div class="flex flex-col gap-3 mt-auto relative z-10">
+              <div class="w-2 h-2 bg-orange-500 rounded-full mb-1 shadow-[0_0_10px_rgba(249,115,22,0.8)]"></div>
+              <h3 class="text-base font-semibold tracking-wide text-white drop-shadow-md">Seine River Cruise</h3>
+              <p class="text-[11px] text-neutral-300 font-normal leading-relaxed drop-shadow-md">Witness Paris illuminated from the tranquil waters of the Seine.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- Fourth Section - Founder (Reusing Testimonial Layout) -->
+      <div id="founder" class="w-full max-w-7xl bg-transparent border border-white/10 rounded-2xl py-16 px-6 md:px-12 flex flex-col items-center justify-start text-center relative overflow-hidden min-h-[550px] shrink-0 mt-12">
+        
+        <div class="absolute -bottom-1/3 -right-1/4 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[150px] pointer-events-none"></div>
+        <div class="absolute top-1/4 left-1/4 w-80 h-80 rounded-full bg-blue-900/10 blur-[120px] pointer-events-none"></div>
+
+        <!-- Outer Layout Grid -->
+        <div class="w-full flex flex-col md:flex-row gap-8 items-stretch z-10 text-left">
+          
+          <!-- Left Block - Profile Portrait -->
+          <div data-aos="fade-right" class="w-full md:w-[35%] aspect-[3/4] md:h-[450px] relative rounded-2xl overflow-hidden border border-white/10 bg-white/[0.02] flex items-center justify-center group shrink-0">
+            <img
+              src="founder_portrait_1784522271107.png"
+              alt="Saswat Subhransu Singh"
+              class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+            />
+          </div>
+
+          <!-- Right Block - Testimonial with custom blue radial background gradient -->
+          <div data-aos="fade-left" data-aos-delay="100"
+            class="w-full md:w-[65%] border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col justify-between relative overflow-hidden bg-black/60 backdrop-blur-md"
+            style="background-image: radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.12) 0%, rgba(0,0,0,0) 70%);"
+          >
+            <!-- Top Quote Content -->
+            <div class="flex flex-col gap-6">
+              <span class="text-[9px] tracking-[0.3em] uppercase font-bold text-blue-400">
+                Meet the Founder
+              </span>
+              <p class="font-sans text-lg sm:text-xl md:text-2xl lg:text-[25px] font-medium leading-relaxed tracking-tight text-white max-w-2xl">
+                "My vision is to make every journey through Paris effortless, luxurious, and unforgettable. We combine local expertise with personalized planning so every traveler experiences the City of Light in a truly unique way."
+              </p>
+            </div>
+
+            <!-- Metrics and Author Details -->
+            <div class="mt-12 flex flex-col gap-8 md:gap-10 border-t border-white/10 pt-8">
+              <!-- Metrics Row (Adapted to luxury stats) -->
+              <div class="grid grid-cols-3 gap-4">
+                <div class="flex flex-col items-start">
+                  <span class="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white font-sans">10+</span>
+                  <span class="text-[8.5px] tracking-[0.15em] uppercase text-neutral-500 font-semibold mt-1">Years Experience</span>
+                </div>
+                
+                <div class="flex flex-col items-start">
+                  <span class="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white font-sans">100%</span>
+                  <span class="text-[8.5px] tracking-[0.15em] uppercase text-neutral-500 font-semibold mt-1">Tailored Itineraries</span>
+                </div>
+
+                <div class="flex flex-col items-start">
+                  <span class="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white font-sans">24/7</span>
+                  <span class="text-[8.5px] tracking-[0.15em] uppercase text-neutral-500 font-semibold mt-1 font-mono">Dedicated Support</span>
+                </div>
+              </div>
+
+              <!-- Author Info -->
+              <div class="flex flex-col items-start leading-tight">
+                <span class="text-[11px] tracking-[0.25em] font-bold text-white uppercase">
+                  — Saswat Subhransu Singh
+                </span>
+                <span class="text-[8px] tracking-[0.15em] uppercase text-neutral-500 font-semibold mt-1">
+                  Founder, Journeys
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Fifth Section - Tours (Reusing Amenities Layout with Empty Center) -->
+      <div id="tours" class="w-full max-w-7xl bg-transparent border border-white/10 rounded-2xl py-16 px-6 md:px-12 flex flex-col items-center justify-start text-center relative overflow-hidden min-h-[700px] shrink-0 mt-12">
+        
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-500/5 blur-[130px] pointer-events-none"></div>
+
+        <!-- Section Header -->
+        <div class="w-full flex flex-col items-center gap-4 z-10 mb-12">
+          <span data-aos="fade-up" class="text-[9px] tracking-[0.3em] uppercase font-bold text-neutral-400">
+            Tour Packages
+          </span>
+          <h2 data-aos="fade-up" data-aos-delay="100" class="text-3xl sm:text-4xl md:text-[42px] font-normal leading-[1.25] tracking-tight max-w-3xl text-white">
+            <span class="font-serif italic font-light text-white mr-3">Curated Tours</span>
+            <span class="font-sans font-medium text-white">Designed Around You</span>
+          </h2>
+          <p data-aos="fade-up" data-aos-delay="100" class="text-neutral-400 text-xs md:text-sm max-w-md font-normal leading-relaxed tracking-wide">
+            Whether you're seeking romance, culture, food, or adventure, our expert guides create unforgettable experiences tailored to every traveler.
+          </p>
+        </div>
+
+        <!-- 3-Column Responsive Grid (Left Cards, Center Empty Visual Slot, Right Cards) -->
+        <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch z-10">
+          
+          <!-- Left Column: 3 Cards -->
+          <div class="flex flex-col gap-6 justify-between h-full">
+            <!-- Card 1 -->
+            <div data-aos="fade-up" data-aos-delay="100" class="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-xl p-6 flex flex-col justify-between gap-4 text-left transition-all duration-300 hover:border-white/20 min-h-[140px]">
+              <div class="flex items-center justify-between">
+                <span class="text-[8px] tracking-[0.2em] uppercase text-neutral-500 font-bold">01 / Day Tour</span>
+                <div class="w-5 h-5 bg-white/5 border border-white/10 flex items-center justify-center rounded"><svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <h3 class="text-xs font-semibold tracking-[0.1em] uppercase text-white">Paris in One Day</h3>
+                <p class="text-[11px] text-neutral-400 font-normal leading-relaxed">Visit the city's top attractions with a knowledgeable local guide.</p>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div data-aos="fade-up" data-aos-delay="200" class="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-xl p-6 flex flex-col justify-between gap-4 text-left transition-all duration-300 hover:border-white/20 min-h-[140px]">
+              <div class="flex items-center justify-between">
+                <span class="text-[8px] tracking-[0.2em] uppercase text-neutral-500 font-bold">02 / Romance</span>
+                <div class="w-5 h-5 bg-white/5 border border-white/10 flex items-center justify-center rounded"><svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg></div>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <h3 class="text-xs font-semibold tracking-[0.1em] uppercase text-white">Romantic Paris Escape</h3>
+                <p class="text-[11px] text-neutral-400 font-normal leading-relaxed">Perfect for couples with sunset cruises, luxury dining, and private city tours.</p>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div data-aos="fade-up" data-aos-delay="300" class="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-xl p-6 flex flex-col justify-between gap-4 text-left transition-all duration-300 hover:border-white/20 min-h-[140px]">
+              <div class="flex items-center justify-between">
+                <span class="text-[8px] tracking-[0.2em] uppercase text-neutral-500 font-bold">03 / Culture</span>
+                <div class="w-5 h-5 bg-white/5 border border-white/10 flex items-center justify-center rounded"><svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg></div>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <h3 class="text-xs font-semibold tracking-[0.1em] uppercase text-white">Art & History Tour</h3>
+                <p class="text-[11px] text-neutral-400 font-normal leading-relaxed">Explore museums, historic monuments, and hidden cultural gems.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center Column: Intentionally empty layout space for visual placeholder -->
+          <div data-aos="zoom-in" data-aos-delay="400" class="flex items-center justify-center border border-dashed border-white/10 bg-white/[0.01] rounded-xl p-8 min-h-[280px] lg:min-h-full relative overflow-hidden group">
+            <!-- Soft indicator of empty slot -->
+            <div class="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
+            <div class="flex flex-col items-center text-center gap-2 z-10">
+              <span class="text-[7.5px] tracking-[0.3em] uppercase text-neutral-600 font-bold">
+                [ VISUAL CONTAINER PLACEHOLDER ]
+              </span>
+              <p class="text-[9px] text-neutral-500 font-light max-w-[200px]">
+                This central space is preserved completely clear for dynamic rich assets or interactive 3D elements.
+              </p>
+            </div>
+          </div>
+
+          <!-- Right Column: 3 Cards -->
+          <div class="flex flex-col gap-6 justify-between h-full">
+            <!-- Card 4 -->
+            <div data-aos="fade-up" data-aos-delay="500" class="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-xl p-6 flex flex-col justify-between gap-4 text-left transition-all duration-300 hover:border-white/20 min-h-[140px]">
+              <div class="flex items-center justify-between">
+                <span class="text-[8px] tracking-[0.2em] uppercase text-neutral-500 font-bold">04 / Culinary</span>
+                <div class="w-5 h-5 bg-white/5 border border-white/10 flex items-center justify-center rounded"><svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" /></svg></div>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <h3 class="text-xs font-semibold tracking-[0.1em] uppercase text-white">Food & Wine Experience</h3>
+                <p class="text-[11px] text-neutral-400 font-normal leading-relaxed">Taste authentic French cuisine, pastries, cheeses, and premium wines.</p>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div data-aos="fade-up" data-aos-delay="600" class="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-xl p-6 flex flex-col justify-between gap-4 text-left transition-all duration-300 hover:border-white/20 min-h-[140px]">
+              <div class="flex items-center justify-between">
+                <span class="text-[8px] tracking-[0.2em] uppercase text-neutral-500 font-bold">05 / Fun</span>
+                <div class="w-5 h-5 bg-white/5 border border-white/10 flex items-center justify-center rounded"><svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <h3 class="text-xs font-semibold tracking-[0.1em] uppercase text-white">Family Adventure</h3>
+                <p class="text-[11px] text-neutral-400 font-normal leading-relaxed">Fun-filled attractions, Disneyland Paris, and interactive sightseeing.</p>
+              </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div data-aos="fade-up" data-aos-delay="700" class="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-xl p-6 flex flex-col justify-between gap-4 text-left transition-all duration-300 hover:border-white/20 min-h-[140px]">
+              <div class="flex items-center justify-between">
+                <span class="text-[8px] tracking-[0.2em] uppercase text-neutral-500 font-bold">06 / VIP</span>
+                <div class="w-5 h-5 bg-white/5 border border-white/10 flex items-center justify-center rounded"><svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg></div>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <h3 class="text-xs font-semibold tracking-[0.1em] uppercase text-white">Luxury Private Tour</h3>
+                <p class="text-[11px] text-neutral-400 font-normal leading-relaxed">Enjoy exclusive transportation, VIP access, and a personalized itinerary.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- CONTACT SECTION -->
+      <div id="contact" class="w-full max-w-7xl mt-12 bg-transparent border border-white/10 rounded-2xl py-16 px-6 md:px-12 flex flex-col items-center justify-start text-left relative overflow-hidden shrink-0">
+        <div class="w-full flex flex-col items-center gap-4 z-10 mb-16 text-center">
+          <span data-aos="fade-up" class="text-[9px] tracking-[0.3em] uppercase font-bold text-neutral-400">Contact Us</span>
+          <h2 data-aos="fade-up" data-aos-delay="100" class="text-3xl sm:text-4xl md:text-[42px] font-normal leading-[1.25] tracking-tight max-w-3xl text-white">
+            <span class="font-serif italic font-light text-white mr-3">Let's Plan Your</span>
+            <span class="font-sans font-medium text-white">Paris Adventure</span>
+          </h2>
+          <p data-aos="fade-up" data-aos-delay="200" class="text-neutral-400 text-xs md:text-sm max-w-xl font-normal leading-relaxed tracking-wide mt-4">
+            Have questions or ready to book your dream vacation? Our travel experts are here to help every step of the way.
+          </p>
+        </div>
+
+        <div class="w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-start z-10">
+          <div data-aos="fade-right" class="flex flex-col gap-10">
+            <div>
+              <h3 class="text-sm font-semibold tracking-[0.1em] uppercase text-white mb-6 border-b border-white/10 pb-2">Contact Information</h3>
+              <div class="flex flex-col gap-4 text-sm text-neutral-400">
+                <p><strong class="text-white block text-xs tracking-wider uppercase mb-1">Email</strong> hello@journeysparis.com</p>
+                <p><strong class="text-white block text-xs tracking-wider uppercase mb-1">Phone</strong> +33 1 23 45 67 89</p>
+                <p><strong class="text-white block text-xs tracking-wider uppercase mb-1">Office</strong> Paris, France</p>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-semibold tracking-[0.1em] uppercase text-white mb-6 border-b border-white/10 pb-2">Business Hours</h3>
+              <div class="flex flex-col gap-4 text-sm text-neutral-400">
+                <div class="flex justify-between max-w-xs"><span class="text-white text-xs tracking-wider uppercase">Monday – Friday</span> <span>9:00 AM – 7:00 PM</span></div>
+                <div class="flex justify-between max-w-xs"><span class="text-white text-xs tracking-wider uppercase">Saturday</span> <span>10:00 AM – 5:00 PM</span></div>
+                <div class="flex justify-between max-w-xs"><span class="text-white text-xs tracking-wider uppercase">Sunday</span> <span>Closed</span></div>
+              </div>
+            </div>
+          </div>
+          <div data-aos="fade-left" class="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-2xl p-8">
+            <form class="flex flex-col gap-5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <input type="text" placeholder="Full Name" class="bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-white/30 transition-colors">
+                <input type="email" placeholder="Email Address" class="bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <input type="tel" placeholder="Phone Number" class="bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-white/30 transition-colors">
+                <input type="text" placeholder="Destination" class="bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <input type="date" class="bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-neutral-400 focus:text-white focus:outline-none focus:border-white/30 transition-colors">
+                <input type="number" placeholder="Number of Travelers" min="1" class="bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-white/30 transition-colors">
+              </div>
+              <textarea placeholder="Message" rows="4" class="bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-white/30 transition-colors resize-none"></textarea>
+              <button type="button" class="mt-2 bg-white text-black px-6 py-3 rounded-lg font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-neutral-200 transition-all shadow-lg self-start">
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER SECTION -->
+      <footer class="w-full max-w-7xl mt-16 border-t border-white/10 pt-16 pb-8 px-6 md:px-12 flex flex-col gap-12 z-10 shrink-0">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div class="flex flex-col gap-4">
+            <span class="text-sm tracking-[0.4em] uppercase font-bold text-white">Journeys</span>
+            <p class="text-xs text-neutral-400 leading-relaxed">Crafting unforgettable Paris experiences with elegance, comfort, and local expertise.</p>
+          </div>
+          <div class="flex flex-col gap-4">
+            <h4 class="text-[10px] tracking-[0.2em] uppercase font-bold text-white mb-2">Quick Links</h4>
+            <a href="#home" class="text-xs text-neutral-400 hover:text-white transition-colors">Home</a>
+            <a href="#destinations" class="text-xs text-neutral-400 hover:text-white transition-colors">Destinations</a>
+            <a href="#tours" class="text-xs text-neutral-400 hover:text-white transition-colors">Tours</a>
+            <a href="#about" class="text-xs text-neutral-400 hover:text-white transition-colors">About Us</a>
+            <a href="#contact" class="text-xs text-neutral-400 hover:text-white transition-colors">Contact</a>
+          </div>
+          <div class="flex flex-col gap-4">
+            <h4 class="text-[10px] tracking-[0.2em] uppercase font-bold text-white mb-2">Services</h4>
+            <a href="#" class="text-xs text-neutral-400 hover:text-white transition-colors">Private Tours</a>
+            <a href="#" class="text-xs text-neutral-400 hover:text-white transition-colors">Hotel Bookings</a>
+            <a href="#" class="text-xs text-neutral-400 hover:text-white transition-colors">Airport Transfers</a>
+            <a href="#" class="text-xs text-neutral-400 hover:text-white transition-colors">River Cruises</a>
+            <a href="#" class="text-xs text-neutral-400 hover:text-white transition-colors">Luxury Packages</a>
+          </div>
+          <div class="flex flex-col gap-4">
+            <h4 class="text-[10px] tracking-[0.2em] uppercase font-bold text-white mb-2">Stay Inspired</h4>
+            <p class="text-xs text-neutral-400 leading-relaxed">Subscribe to receive exclusive travel offers, seasonal guides, and insider tips for exploring Paris.</p>
+            <div class="flex mt-2">
+              <input type="email" placeholder="Your email" class="bg-white/5 border border-white/10 rounded-l-lg p-2.5 text-xs text-white focus:outline-none w-full">
+              <button class="bg-white text-black px-4 rounded-r-lg font-bold text-[9px] tracking-[0.1em] uppercase hover:bg-neutral-200 transition-colors">Subscribe</button>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-white/10 pt-8 mt-4 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-neutral-500 uppercase tracking-wider">
+          <span>&copy; 2026 Journeys Paris. All rights reserved.</span>
+          <div class="flex gap-4">
+            <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('scroll-canvas');
+        const context = canvas.getContext('2d');
+        const frameCount = 300;
+        
+        // Construct frame path (ezgif-frame-001.jpg up to 300)
+        const currentFrame = index => (
+            `ezgif-frame-${(index + 1).toString().padStart(3, '0')}.jpg`
+        );
+
+        const images = [];
+
+        // Preload all images for smooth rendering
+        for (let i = 0; i < frameCount; i++) {
+            const img = new Image();
+            img.src = currentFrame(i);
+            images.push(img);
+        }
+
+        // Initialize canvas when the first frame is loaded
+        images[0].onload = function() {
+            canvas.width = images[0].width;
+            canvas.height = images[0].height;
+            context.drawImage(images[0], 0, 0);
+        }
+
+        let currentFrameIndex = 0;
+
+        // Handle scrolling
+        window.addEventListener('scroll', () => {  
+            const scrollTop = document.documentElement.scrollTop;
+            const maxScrollTop = document.documentElement.scrollHeight - window.innerHeight;
+            
+            // Calculate the fraction of the scroll progress
+            const scrollFraction = maxScrollTop > 0 ? scrollTop / maxScrollTop : 0;
+            
+            // Map the scroll fraction to the frame index
+            const frameIndex = Math.min(
+                frameCount - 1,
+                Math.max(0, Math.floor(scrollFraction * frameCount))
+            );
+            
+            if (frameIndex !== currentFrameIndex) {
+                currentFrameIndex = frameIndex;
+                requestAnimationFrame(() => {
+                    // Only draw if the image has finished loading
+                    if (images[currentFrameIndex].complete) {
+                        // we can optionally clear and redraw to be safe, but since images are fully opaque it's fine
+                        context.drawImage(images[currentFrameIndex], 0, 0);
+                    }
+                });
+            }
+        });
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: false,
+            mirror: true,
+            offset: 100,
+        });
+    </script>
+
+    <!-- Mobile / Overlay Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-3xl hidden opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center">
+      <button onclick="document.getElementById('mobile-menu').classList.add('opacity-0'); setTimeout(() => document.getElementById('mobile-menu').classList.add('hidden'), 300);" class="absolute top-10 right-10 text-white hover:text-neutral-400 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+      <nav class="flex flex-col items-center gap-10 text-3xl md:text-5xl font-serif italic font-light text-white">
+        <a href="#home" onclick="document.getElementById('mobile-menu').classList.add('opacity-0'); setTimeout(() => document.getElementById('mobile-menu').classList.add('hidden'), 300);" class="hover:text-neutral-400 transition-colors">Home</a>
+        <a href="#destinations" onclick="document.getElementById('mobile-menu').classList.add('opacity-0'); setTimeout(() => document.getElementById('mobile-menu').classList.add('hidden'), 300);" class="hover:text-neutral-400 transition-colors">Destinations</a>
+        <a href="#tours" onclick="document.getElementById('mobile-menu').classList.add('opacity-0'); setTimeout(() => document.getElementById('mobile-menu').classList.add('hidden'), 300);" class="hover:text-neutral-400 transition-colors">Tours</a>
+        <a href="#about" onclick="document.getElementById('mobile-menu').classList.add('opacity-0'); setTimeout(() => document.getElementById('mobile-menu').classList.add('hidden'), 300);" class="hover:text-neutral-400 transition-colors">About Us</a>
+        <a href="#contact" onclick="document.getElementById('mobile-menu').classList.add('opacity-0'); setTimeout(() => document.getElementById('mobile-menu').classList.add('hidden'), 300);" class="hover:text-neutral-400 transition-colors">Contact</a>
+      </nav>
+    </div>
+
+</body>
+</html>
